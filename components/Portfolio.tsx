@@ -209,17 +209,6 @@ function AnimationSystem() {
           );
         });
 
-        gsap.to(".hero-aura", {
-          yPercent: 32,
-          ease: "none",
-          scrollTrigger: {
-            trigger: ".hero-section",
-            start: "top top",
-            end: "bottom top",
-            scrub: 0.8,
-          },
-        });
-
         gsap.to(".practice-rail.frontend", {
           xPercent: 2.5,
           ease: "none",
@@ -327,23 +316,25 @@ function Header() {
 function Hero() {
   return (
     <section className="hero-section" id="top" aria-labelledby="hero-title">
-      <div className="hero-aura" aria-hidden="true" />
       <div className="section-coordinates">
         <span>Frontend / Automation / AI</span>
         <span>31.52° N / Remote worldwide</span>
       </div>
 
       <div className="hero-lockup">
-        <div className="hero-identity" data-reveal>
-          <p className="eyebrow">{siteConfig.name}</p>
-          <p>{siteConfig.role}</p>
+        <div className="hero-copy">
+          <div className="hero-identity" data-reveal>
+            <p className="hero-name">{siteConfig.name}</p>
+            <p>{siteConfig.role}</p>
+          </div>
+          <h1 id="hero-title">
+            <span className="mask-line"><span>I build polished</span></span>
+            <span className="mask-line accent-cyan"><span>digital products</span></span>
+            <span className="mask-line"><span>and automate the</span></span>
+            <span className="mask-line accent-coral"><span>systems behind them.</span></span>
+          </h1>
         </div>
-        <h1 id="hero-title">
-          <span className="mask-line"><span>I build polished</span></span>
-          <span className="mask-line accent-cyan"><span>digital products</span></span>
-          <span className="mask-line"><span>and automate the</span></span>
-          <span className="mask-line accent-coral"><span>systems behind them.</span></span>
-        </h1>
+        <HeroSystem />
       </div>
 
       <div className="hero-support" data-reveal>
@@ -369,6 +360,35 @@ function Hero() {
         Scroll to explore selected work
       </a>
     </section>
+  );
+}
+
+function HeroSystem() {
+  return (
+    <div className="hero-system" aria-hidden="true" data-reveal>
+      <div className="hero-system-bar">
+        <span>Live system / 01</span>
+        <span><i /> Connected</span>
+      </div>
+      <div className="hero-system-map">
+        <span className="hero-system-path path-a" />
+        <span className="hero-system-path path-b" />
+        <i className="hero-system-packet" />
+        <div className="hero-system-node node-ui">
+          <small>01 / Interface</small><b>Product UI</b><em>Next.js · React</em>
+        </div>
+        <div className="hero-system-node node-api">
+          <small>02 / Contract</small><b>Typed API</b><em>Validated data</em>
+        </div>
+        <div className="hero-system-node node-flow">
+          <small>03 / Orchestration</small><b><TechIcon id="n8n" /> n8n flow</b><em>Rules · state · retries</em>
+        </div>
+        <div className="hero-system-node node-output">
+          <small>04 / Intelligence</small><b>AI + Data</b><em>Analysis · actions</em>
+        </div>
+      </div>
+      <div className="hero-system-footer"><span>Frontend engineering</span><span>Automation systems</span></div>
+    </div>
   );
 }
 
