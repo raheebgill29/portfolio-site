@@ -221,12 +221,12 @@ function AnimationSystem() {
         });
 
         gsap.to(".practice-rail.frontend", {
-          xPercent: 8,
+          xPercent: 2.5,
           ease: "none",
           scrollTrigger: { trigger: ".practice-bridge", scrub: 1, start: "top bottom", end: "bottom top" },
         });
         gsap.to(".practice-rail.automation", {
-          xPercent: -8,
+          xPercent: -2.5,
           ease: "none",
           scrollTrigger: { trigger: ".practice-bridge", scrub: 1, start: "top bottom", end: "bottom top" },
         });
@@ -397,7 +397,12 @@ function PracticeBridge() {
     <section className="practice-bridge" aria-labelledby="practice-title">
       <p className="eyebrow" id="practice-title">Two practices / one product system</p>
       <div className="practice-rail frontend"><span>Frontend engineering</span><i>→</i></div>
-      <div className="api-core"><span>API</span><small>Shared contract</small></div>
+      <div className="api-core">
+        <span className="api-core-kicker">System bridge / 00</span>
+        <strong>API</strong>
+        <span className="api-core-ports" aria-hidden="true"><i /><i /></span>
+        <small><b>Shared contract</b><em>REST / events</em></small>
+      </div>
       <div className="practice-rail automation"><i>←</i><span>Automation + AI</span></div>
     </section>
   );
@@ -799,7 +804,11 @@ function TechnologyConstellation({
 
   return (
     <div className={`constellation constellation-${kind}`} data-reveal>
-      <header><span>{kind === "frontend" ? "A" : "B"}</span><h3>{title}</h3><small>{items.length} technologies</small></header>
+      <header>
+        <span>{kind === "frontend" ? "A" : "B"}</span>
+        <h3>{title}</h3>
+        <small>{items.length} technologies <i>Swipe →</i></small>
+      </header>
       <div className="constellation-field">
         <div className="constellation-lines" aria-hidden="true">
           {Array.from({ length: kind === "automation" ? 9 : 6 }, (_, index) => <span className={`line-${index + 1}`} key={index} />)}
@@ -875,9 +884,16 @@ function ContactSection() {
             event.currentTarget.style.setProperty("--magnetic-y", "0px");
           }}
         >
-          Start a conversation <span aria-hidden="true">↗</span>
+          <span className="contact-primary-copy">
+            <small>Project enquiry / email</small>
+            <b>Start a conversation</b>
+          </span>
+          <span className="contact-primary-arrow" aria-hidden="true">↗</span>
         </a>
-        <p>Available for remote frontend, full-stack, n8n and AI automation opportunities.</p>
+        <div className="contact-availability">
+          <span><i aria-hidden="true" /> Open to remote work</span>
+          <p>Available for remote frontend, full-stack, n8n and AI automation opportunities.</p>
+        </div>
       </div>
       <div className="contact-links">
         <a href={`mailto:${siteConfig.email}`}>Email <span>{siteConfig.email}</span></a>
