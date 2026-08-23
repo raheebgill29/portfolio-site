@@ -129,7 +129,11 @@ export function AutomationEngine() {
   const [activeStage, setActiveStage] = useState(0);
   const [finalRunning, setFinalRunning] = useState(false);
   const [expandedNode, setExpandedNode] = useState<string | null>(null);
-  const currentStage = automationStages[activeStage];
+  const displayedStage = reduceMotion || !isDesktop
+    ? automationStages.length - 1
+    : activeStage;
+  const displayedFinalRunning = reduceMotion ? true : isDesktop && finalRunning;
+  const currentStage = automationStages[displayedStage];
 
   useEffect(() => {
     const media = window.matchMedia("(min-width: 1181px) and (min-height: 720px)");
@@ -142,9 +146,7 @@ export function AutomationEngine() {
   useEffect(() => {
     if (reduceMotion || !isDesktop) {
       activeStageRef.current = automationStages.length - 1;
-      setActiveStage(automationStages.length - 1);
       finalRunningRef.current = Boolean(reduceMotion);
-      setFinalRunning(Boolean(reduceMotion));
       return;
     }
 
@@ -246,7 +248,7 @@ export function AutomationEngine() {
   return (
     <section
       ref={sectionRef}
-      className={`automation-engine ${finalRunning ? "is-final-running" : ""}`}
+      className={`automation-engine ${displayedFinalRunning ? "is-final-running" : ""}`}
       id="automation"
       aria-labelledby="automation-title"
     >
@@ -293,7 +295,7 @@ export function AutomationEngine() {
               </div>
               <ol className="automation-progress" aria-label="Automation pipeline progress">
                 {automationStages.map((stage, index) => {
-                  const state = getStageState(index, activeStage, finalRunning);
+                  const state = getStageState(index, displayedStage, displayedFinalRunning);
                   return (
                     <li key={stage.id} className={`is-${state}`} aria-current={state === "active" ? "step" : undefined}>
                       <span>{stage.number}</span><i aria-hidden="true" />
@@ -306,11 +308,11 @@ export function AutomationEngine() {
             <div ref={workspaceRef} className="automation-engine-workspace">
               <svg className="automation-engine-connectors" viewBox="0 0 1200 520" preserveAspectRatio="none" aria-hidden="true">
                 {connectorPaths.map((path, index) => {
-                  const connectorState = finalRunning
+                  const connectorState = displayedFinalRunning
                     ? "running"
-                    : index < activeStage
+                    : index < displayedStage
                       ? "complete"
-                      : index === activeStage
+                      : index === displayedStage
                         ? "active"
                         : "idle";
                   return (
@@ -335,8 +337,8 @@ export function AutomationEngine() {
                     key={stage.id}
                     stage={stage}
                     stageIndex={index}
-                    activeStage={activeStage}
-                    finalRunning={finalRunning}
+                    activeStage={displayedStage}
+                    finalRunning={displayedFinalRunning}
                     expandedNode={expandedNode}
                     onToggleNode={toggleNode}
                   />
@@ -344,7 +346,7 @@ export function AutomationEngine() {
               </ol>
             </div>
 
-            <div className="automation-engine-closing" aria-hidden={!finalRunning}>
+            <div className="automation-engine-closing" aria-hidden={!displayedFinalRunning}>
               <p>Automation that doesn’t just run—it recovers, adapts and escalates.</p>
               <a
                 href="#work"
