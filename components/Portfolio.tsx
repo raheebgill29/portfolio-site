@@ -11,6 +11,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type FormEvent,
   type PointerEvent as ReactPointerEvent,
   type RefObject,
 } from "react";
@@ -877,12 +878,92 @@ function SkillsSection() {
 }
 
 function ContactSection() {
-  const magneticMove = (event: ReactPointerEvent<HTMLAnchorElement>) => {
+  const [formOpen, setFormOpen] = useState(false);
+  const [formStatus, setFormStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [statusMessage, setStatusMessage] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+  const emailJsReady = Boolean(
+    siteConfig.emailjs.serviceId &&
+    siteConfig.emailjs.templateId &&
+    siteConfig.emailjs.publicKey,
+  );
+
+  const magneticMove = (event: ReactPointerEvent<HTMLButtonElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width - 0.5) * 18;
     const y = ((event.clientY - rect.top) / rect.height - 0.5) * 18;
     event.currentTarget.style.setProperty("--magnetic-x", `${x}px`);
     event.currentTarget.style.setProperty("--magnetic-y", `${y}px`);
+  };
+
+  const submitContact = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (formStatus === "sending") return;
+
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    if (String(data.get("website") ?? "").trim()) {
+      setFormStatus("success");
+      setStatusMessage("Thanks — your message has been received.");
+      form.reset();
+      return;
+    }
+
+    const name = String(data.get("name") ?? "").trim();
+    const email = String(data.get("email") ?? "").trim();
+    const company = String(data.get("company") ?? "").trim();
+    const projectType = String(data.get("project_type") ?? "").trim();
+    const message = String(data.get("message") ?? "").trim();
+
+    if (!emailJsReady) {
+      const subject = encodeURIComponent(`Portfolio enquiry from ${name}`);
+      const body = encodeURIComponent(
+        `Name: ${name}\nEmail: ${email}\nCompany: ${company || "Not provided"}\nProject type: ${projectType}\n\n${message}`,
+      );
+      setFormStatus("success");
+      setStatusMessage("Opening your email app so the message can still be sent.");
+      window.location.href = `mailto:${siteConfig.email}?subject=${subject}&body=${body}`;
+      return;
+    }
+
+    setFormStatus("sending");
+    setStatusMessage("Sending your project brief…");
+
+    try {
+      const sentAt = new Date().toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
+      const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          service_id: siteConfig.emailjs.serviceId,
+          template_id: siteConfig.emailjs.templateId,
+          user_id: siteConfig.emailjs.publicKey,
+          template_params: {
+            name,
+            email,
+            user_name: name,
+            user_email: email,
+            from_name: name,
+            reply_to: email,
+            company,
+            project_type: projectType,
+            title: projectType,
+            message,
+            time: sentAt,
+            sent_at: sentAt,
+            to_name: siteConfig.name,
+          },
+        }),
+      });
+
+      if (!response.ok) throw new Error(await response.text());
+      form.reset();
+      setFormStatus("success");
+      setStatusMessage("Message sent. I’ll get back to you as soon as possible.");
+    } catch {
+      setFormStatus("error");
+      setStatusMessage("The message could not be sent. Please use the email link below instead.");
+    }
   };
 
   return (
@@ -895,9 +976,16 @@ function ContactSection() {
         <strong>Let’s build it.</strong>
       </h2>
       <div className="contact-actions">
-        <a
+        <button
+          type="button"
           className="contact-primary"
-          href={`mailto:${siteConfig.email}?subject=Let’s build something`}
+          aria-expanded={formOpen}
+          aria-controls="contact-form-panel"
+          onClick={() => {
+            setFormOpen((open) => !open);
+            setFormStatus("idle");
+            setStatusMessage("");
+          }}
           onPointerMove={magneticMove}
           onPointerLeave={(event) => {
             event.currentTarget.style.setProperty("--magnetic-x", "0px");
@@ -905,15 +993,76 @@ function ContactSection() {
           }}
         >
           <span className="contact-primary-copy">
-            <small>Project enquiry / email</small>
+            <small>Project enquiry / contact form</small>
             <b>Start a conversation</b>
           </span>
-          <span className="contact-primary-arrow" aria-hidden="true">↗</span>
-        </a>
+          <span className="contact-primary-arrow" aria-hidden="true">{formOpen ? "×" : "↗"}</span>
+        </button>
         <div className="contact-availability">
           <span><i aria-hidden="true" /> Open to remote work</span>
           <p>Available for remote frontend, full-stack, n8n and AI automation opportunities.</p>
         </div>
+        <AnimatePresence initial={false}>
+          {formOpen ? (
+            <motion.div
+              className="contact-form-panel"
+              id="contact-form-panel"
+              initial={{ opacity: 0, height: 0, y: 18 }}
+              animate={{ opacity: 1, height: "auto", y: 0 }}
+              exit={{ opacity: 0, height: 0, y: 12 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="contact-form-heading">
+                <span>{emailJsReady ? "Project brief / direct to inbox" : "Project brief / email fallback"}</span>
+                <h3>Tell me what you’re building.</h3>
+                <p>Share the product, workflow, or operational problem you want to solve.</p>
+              </div>
+              <form ref={formRef} onSubmit={submitContact}>
+                <div className="contact-form-grid">
+                  <label>
+                    <span>Name *</span>
+                    <input name="name" type="text" autoComplete="name" required maxLength={80} placeholder="Your name" />
+                  </label>
+                  <label>
+                    <span>Email *</span>
+                    <input name="email" type="email" autoComplete="email" required maxLength={120} placeholder="you@company.com" />
+                  </label>
+                  <label>
+                    <span>Company</span>
+                    <input name="company" type="text" autoComplete="organization" maxLength={100} placeholder="Company or team" />
+                  </label>
+                  <label>
+                    <span>Opportunity *</span>
+                    <select name="project_type" required defaultValue="">
+                      <option value="" disabled>Select an opportunity</option>
+                      <option>Frontend product</option>
+                      <option>Full-stack product</option>
+                      <option>n8n automation</option>
+                      <option>AI workflow</option>
+                      <option>Remote role</option>
+                      <option>Something else</option>
+                    </select>
+                  </label>
+                  <label className="contact-message-field">
+                    <span>Project brief *</span>
+                    <textarea name="message" required minLength={20} maxLength={2500} placeholder="A little context, what needs to be built, and where you need help…" />
+                  </label>
+                  <label className="contact-honeypot" aria-hidden="true">
+                    Website<input name="website" type="text" tabIndex={-1} autoComplete="off" />
+                  </label>
+                </div>
+                <div className="contact-form-footer">
+                  <p role="status" aria-live="polite" data-status={formStatus}>
+                    {statusMessage || (emailJsReady ? "Your message will be sent securely through EmailJS." : "EmailJS setup pending — email fallback is active.")}
+                  </p>
+                  <button type="submit" disabled={formStatus === "sending"}>
+                    {formStatus === "sending" ? "Sending…" : "Send project brief"}<span aria-hidden="true">↗</span>
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
       </div>
       <div className="contact-links">
         <a href={`mailto:${siteConfig.email}`}>Email <span>{siteConfig.email}</span></a>

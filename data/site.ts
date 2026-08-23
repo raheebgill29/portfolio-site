@@ -10,6 +10,11 @@ export const siteConfig = {
   availability:
     "Available for frontend, full-stack, and automation opportunities",
   email: "raheebrehman29@gmail.com",
+  emailjs: {
+    serviceId: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ?? "",
+    templateId: process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ?? "",
+    publicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ?? "",
+  },
   links: {
     github: "https://github.com/raheebgill29",
     linkedin: "https://www.linkedin.com/in/raheeb-gill",
