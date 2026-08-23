@@ -23,6 +23,7 @@ export type Project = {
   functionality: string[];
   decisions: string[];
   gallery: { label: string; note: string; image?: string; alt?: string }[];
+  detailGallery?: { label: string; note: string; image?: string; alt?: string }[];
 };
 
 export const projectFilters: { id: ProjectFilter; label: string }[] = [
@@ -132,6 +133,11 @@ export const projects: Project[] = [
       { label: "Conversational workspace", note: "A reusable chat surface connected to production AI services.", image: "/synoptix-image.png", alt: "Synoptix AI platform showing its enterprise website, conversational workspace, and observability dashboard" },
       { label: "Evaluation command centre", note: "Monitoring, charts, safety categories, and request-level detail." },
       { label: "Microsoft connections", note: "Identity and service integrations cross the frontend/service boundary." },
+    ],
+    detailGallery: [
+      { label: "Enterprise AI platform", note: "The public platform introduces Synoptix as an ontology-based agentic AI system for sovereign enterprises.", image: "/synoptix-1.png", alt: "Synoptix AI enterprise platform homepage presenting ontology-based agentic AI capabilities" },
+      { label: "Conversational workspace", note: "The application workspace brings chat, agent discovery, workflows, connections, data, and management tools into one interface.", image: "/synoptix-2.png", alt: "Synoptix AI conversational workspace with navigation, model selection, prompt tools, and chat input" },
+      { label: "Observability dashboard", note: "Operational dashboards expose query activity, model usage, success rates, cost estimates, and department-level engagement.", image: "/synoptix-3.png", alt: "Synoptix AI observability dashboard with usage metrics, filters, charts, and department analytics" },
     ],
   },
   {

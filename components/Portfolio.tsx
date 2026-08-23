@@ -489,12 +489,14 @@ function ProjectMedia({
   project,
   imageIndex = 0,
   expanded = false,
+  gallery = project.gallery,
 }: {
   project: Project;
   imageIndex?: number;
   expanded?: boolean;
+  gallery?: Project["gallery"];
 }) {
-  const image = project.gallery[imageIndex];
+  const image = gallery[imageIndex];
 
   if (!image?.image || !image.alt) {
     return <ProjectVisual kind={project.preview} expanded={expanded} />;
@@ -674,6 +676,7 @@ function CaseStudyOverlay({
 }) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const detailGallery = project.detailGallery ?? project.gallery;
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -798,9 +801,9 @@ function CaseStudyOverlay({
         <section className="case-gallery case-section" aria-labelledby={`gallery-${project.id}`}>
           <p className="case-label" id={`gallery-${project.id}`}>Visual gallery / product views</p>
           <div>
-            {project.gallery.map((item, index) => (
+            {detailGallery.map((item, index) => (
               <figure key={item.label}>
-                <ProjectMedia project={project} imageIndex={index} expanded={index === 0} />
+                <ProjectMedia project={project} gallery={detailGallery} imageIndex={index} expanded={index === 0} />
                 <figcaption><span>{String(index + 1).padStart(2, "0")} / {item.label}</span>{item.note}</figcaption>
               </figure>
             ))}
