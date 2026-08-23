@@ -1,5 +1,5 @@
 export const siteConfig = {
-  name: "Raheeb-ur Rehman",
+  name: "Raheeb ur Rehman",
   initials: "RR",
   role: "Frontend Engineer × n8n AI Automation Developer",
   headline:
@@ -18,7 +18,7 @@ export const siteConfig = {
   links: {
     github: "https://github.com/raheebgill29",
     linkedin: "https://www.linkedin.com/in/raheeb-gill",
-    resume: "/Raheeb-ur-Rehman-Resume.pdf",
+    resume: "/Raheeb ur-Rehman-Resume.pdf",
   },
 } as const;
 

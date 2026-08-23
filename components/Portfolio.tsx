@@ -5,7 +5,9 @@ import {
   motion,
   useReducedMotion,
 } from "framer-motion";
+import Image from "next/image";
 import {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -16,7 +18,7 @@ import {
   type RefObject,
 } from "react";
 
-import { capabilities, skillGroups } from "@/data/capabilities";
+import { skillGroups } from "@/data/capabilities";
 import {
   projectFilters,
   projects,
@@ -31,6 +33,7 @@ import {
 } from "@/data/technologies";
 import { ProjectVisual } from "./ProjectVisual";
 import { TechIcon } from "./TechIcon";
+import { AutomationEngine } from "./AutomationEngine";
 
 const heroWorkflow = [
   { label: "Webhook", detail: "Event received" },
@@ -49,10 +52,41 @@ const practiceKeywords = [
   "Human handoff",
 ] as const;
 
+const technicalEase = [0.22, 1, 0.36, 1] as const;
+
+const heroHeadlineVariants = {
+  hidden: {},
+  visible: { transition: { delayChildren: 0.08, staggerChildren: 0.09 } },
+};
+
+const heroLineVariants = {
+  hidden: { y: "112%" },
+  visible: {
+    y: "0%",
+    transition: { duration: 0.92, ease: technicalEase },
+  },
+};
+
+const heroSystemNodeVariants = {
+  hidden: { opacity: 0, y: 18, scale: 0.985 },
+  visible: (index: number) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.62,
+      delay: 0.26 + index * 0.12,
+      ease: technicalEase,
+    },
+  }),
+};
+
 export default function Portfolio() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [accent, setAccent] = useState("#44cfff");
+  const [introReady, setIntroReady] = useState(false);
   const triggerRef = useRef<HTMLElement | null>(null);
+  const completeIntro = useCallback(() => setIntroReady(true), []);
 
   const openProject = (project: Project, trigger: HTMLElement) => {
     triggerRef.current = trigger;
@@ -64,7 +98,7 @@ export default function Portfolio() {
       className="portfolio-shell"
       style={{ "--active-accent": accent } as CSSProperties}
     >
-      <Loader />
+      <Loader onComplete={completeIntro} />
       <AnimationSystem />
       <CustomCursor />
       <a className="skip-link" href="#main-content">
@@ -73,10 +107,10 @@ export default function Portfolio() {
       <Header />
 
       <main id="main-content">
-        <Hero />
+        <Hero introReady={introReady} />
         <PracticeBridge />
         <ProjectsSection onAccent={setAccent} onOpen={openProject} />
-        <AutomationSection />
+        <AutomationEngine />
         <TechnologySection />
         <SkillsSection />
         <ContactSection />
@@ -96,23 +130,27 @@ export default function Portfolio() {
   );
 }
 
-function Loader() {
+function Loader({ onComplete }: { onComplete: () => void }) {
   const reduceMotion = useReducedMotion();
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     if (reduceMotion || window.sessionStorage.getItem("rr-loader-seen")) {
-      const frame = window.requestAnimationFrame(() => setVisible(false));
+      const frame = window.requestAnimationFrame(() => {
+        setVisible(false);
+        onComplete();
+      });
       return () => window.cancelAnimationFrame(frame);
     }
 
     const timer = window.setTimeout(() => {
       window.sessionStorage.setItem("rr-loader-seen", "true");
       setVisible(false);
+      onComplete();
     }, 1450);
 
     return () => window.clearTimeout(timer);
-  }, [reduceMotion]);
+  }, [onComplete, reduceMotion]);
 
   return (
     <AnimatePresence>
@@ -124,22 +162,12 @@ function Loader() {
           transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
           aria-hidden="true"
         >
-          <div className="loader-mark">
-            <motion.span
-              initial={{ x: -28, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-            >
-              R
-            </motion.span>
-            <motion.span
-              initial={{ x: 28, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.55, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-            >
-              R
-            </motion.span>
-            <i />
+          <div className="loader-orbit">
+            <div className="loader-mark">
+              <span>R</span>
+              <span>R</span>
+              <i />
+            </div>
           </div>
           <div className="loader-progress"><span /></div>
           <p>Interface connected to infrastructure</p>
@@ -196,20 +224,6 @@ function AnimationSystem() {
           );
         });
 
-        gsap.utils.toArray<HTMLElement>(".mask-line > span").forEach((line, index) => {
-          gsap.fromTo(
-            line,
-            { yPercent: 108 },
-            {
-              yPercent: 0,
-              duration: 1.2,
-              delay: index * 0.04,
-              ease: "power4.out",
-              scrollTrigger: { trigger: line, start: "top 94%", once: true },
-            },
-          );
-        });
-
         gsap.to(".practice-rail.frontend", {
           xPercent: 2.5,
           ease: "none",
@@ -229,7 +243,6 @@ function AnimationSystem() {
         gsap.ticker.remove(tick);
         lenis.off("scroll", updateScroll);
         lenis.destroy();
-        ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
       };
     };
 
@@ -297,7 +310,7 @@ function CustomCursor() {
 function Header() {
   return (
     <header className="site-header">
-      <a className="monogram" href="#top" aria-label="Raheeb-ur Rehman, back to top">
+      <a className="monogram" href="#top" aria-label="Raheeb ur Rehman, back to top">
         {siteConfig.initials}<span className="monogram-dot" aria-hidden="true" />
       </a>
       <nav aria-label="Primary navigation">
@@ -314,7 +327,10 @@ function Header() {
   );
 }
 
-function Hero() {
+function Hero({ introReady }: { introReady: boolean }) {
+  const reduceMotion = useReducedMotion();
+  const motionState = introReady || reduceMotion ? "visible" : "hidden";
+
   return (
     <section className="hero-section" id="top" aria-labelledby="hero-title">
       <div className="section-coordinates">
@@ -328,14 +344,19 @@ function Hero() {
             <p className="hero-name">{siteConfig.name}</p>
             <p>{siteConfig.role}</p>
           </div>
-          <h1 id="hero-title">
-            <span className="mask-line"><span>I build polished</span></span>
-            <span className="mask-line accent-cyan"><span>digital products</span></span>
-            <span className="mask-line"><span>and automate the</span></span>
-            <span className="mask-line accent-coral"><span>systems behind them.</span></span>
-          </h1>
+          <motion.h1
+            id="hero-title"
+            initial={reduceMotion ? false : "hidden"}
+            animate={motionState}
+            variants={heroHeadlineVariants}
+          >
+            <span className="mask-line"><motion.span variants={heroLineVariants}>I build polished</motion.span></span>
+            <span className="mask-line accent-cyan"><motion.span variants={heroLineVariants}>digital products</motion.span></span>
+            <span className="mask-line"><motion.span variants={heroLineVariants}>and automate the</motion.span></span>
+            <span className="mask-line accent-coral"><motion.span variants={heroLineVariants}>systems behind them.</motion.span></span>
+          </motion.h1>
         </div>
-        <HeroSystem />
+        <HeroSystem introReady={introReady} />
       </div>
 
       <div className="hero-support" data-reveal>
@@ -364,32 +385,61 @@ function Hero() {
   );
 }
 
-function HeroSystem() {
+function HeroSystem({ introReady }: { introReady: boolean }) {
+  const reduceMotion = useReducedMotion();
+  const motionState = introReady || reduceMotion ? "visible" : "hidden";
+
   return (
-    <div className="hero-system" aria-hidden="true" data-reveal>
-      <div className="hero-system-bar">
+    <motion.div
+      className="hero-system"
+      aria-hidden="true"
+      initial={reduceMotion ? false : "hidden"}
+      animate={motionState}
+      variants={{
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.72, ease: technicalEase } },
+      }}
+    >
+      <motion.div
+        className="hero-system-bar"
+        variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { delay: 0.12, duration: 0.45 } } }}
+      >
         <span>Live system / 01</span>
         <span><i /> Connected</span>
-      </div>
+      </motion.div>
       <div className="hero-system-map">
-        <span className="hero-system-path path-a" />
-        <span className="hero-system-path path-b" />
-        <i className="hero-system-packet" />
-        <div className="hero-system-node node-ui">
+        <motion.span
+          className="hero-system-path path-a"
+          variants={{ hidden: { clipPath: "inset(0 100% 0 0)", opacity: 0 }, visible: { clipPath: "inset(0 0% 0 0)", opacity: 1, transition: { delay: 0.52, duration: 0.9, ease: technicalEase } } }}
+        />
+        <motion.span
+          className="hero-system-path path-b"
+          variants={{ hidden: { clipPath: "inset(0 100% 0 0)", opacity: 0 }, visible: { clipPath: "inset(0 0% 0 0)", opacity: 1, transition: { delay: 0.78, duration: 0.9, ease: technicalEase } } }}
+        />
+        <motion.i
+          className="hero-system-packet"
+          variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { delay: 1.02, duration: 0.35 } } }}
+        />
+        <motion.div className="hero-system-node node-ui" custom={0} variants={heroSystemNodeVariants}>
           <small>01 / Interface</small><b>Product UI</b><em>Next.js · React</em>
-        </div>
-        <div className="hero-system-node node-api">
+        </motion.div>
+        <motion.div className="hero-system-node node-api" custom={1} variants={heroSystemNodeVariants}>
           <small>02 / Contract</small><b>Typed API</b><em>Validated data</em>
-        </div>
-        <div className="hero-system-node node-flow">
+        </motion.div>
+        <motion.div className="hero-system-node node-flow" custom={2} variants={heroSystemNodeVariants}>
           <small>03 / Orchestration</small><b><TechIcon id="n8n" /> n8n flow</b><em>Rules · state · retries</em>
-        </div>
-        <div className="hero-system-node node-output">
+        </motion.div>
+        <motion.div className="hero-system-node node-output" custom={3} variants={heroSystemNodeVariants}>
           <small>04 / Intelligence</small><b>AI + Data</b><em>Analysis · actions</em>
-        </div>
+        </motion.div>
       </div>
-      <div className="hero-system-footer"><span>Frontend engineering</span><span>Automation systems</span></div>
-    </div>
+      <motion.div
+        className="hero-system-footer"
+        variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { delay: 0.92, duration: 0.45 } } }}
+      >
+        <span>Frontend engineering</span><span>Automation systems</span>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -429,6 +479,36 @@ function PracticeBridge() {
   );
 }
 
+function ProjectMedia({
+  project,
+  imageIndex = 0,
+  expanded = false,
+}: {
+  project: Project;
+  imageIndex?: number;
+  expanded?: boolean;
+}) {
+  const image = project.gallery[imageIndex];
+
+  if (!image?.image || !image.alt) {
+    return <ProjectVisual kind={project.preview} expanded={expanded} />;
+  }
+
+  return (
+    <div className={`project-visual project-image-visual ${expanded ? "is-expanded" : ""}`}>
+      <div className="project-image-canvas">
+        <Image
+          src={image.image}
+          alt={image.alt}
+          fill
+          sizes="(max-width: 820px) 100vw, (max-width: 1120px) 90vw, 44vw"
+          quality={88}
+        />
+      </div>
+    </div>
+  );
+}
+
 function ProjectsSection({
   onAccent,
   onOpen,
@@ -438,25 +518,13 @@ function ProjectsSection({
 }) {
   const [filter, setFilter] = useState<ProjectFilter>("all");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const previewRef = useRef<HTMLDivElement>(null);
   const visibleProjects = useMemo(
     () => projects.filter((project) => filter === "all" || project.filterTags.includes(filter)),
     [filter],
   );
   const hoveredProject = projects.find((project) => project.id === hoveredId) ?? null;
-
-  const movePreview = (event: ReactPointerEvent<HTMLElement>) => {
-    const preview = previewRef.current;
-    if (!preview || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
-    const halfWidth = Math.min(window.innerWidth * 0.18, 270);
-    const halfHeight = Math.min(window.innerHeight * 0.19, 190);
-    const x = Math.max(halfWidth + 20, Math.min(event.clientX + halfWidth * 0.8, window.innerWidth - halfWidth - 20));
-    const y = Math.max(halfHeight + 20, Math.min(event.clientY, window.innerHeight - halfHeight - 20));
-    preview.style.setProperty("--preview-x", `${x}px`);
-    preview.style.setProperty("--preview-y", `${y}px`);
-    preview.style.setProperty("--preview-ry", `${(event.clientX / window.innerWidth - 0.5) * 5}deg`);
-    preview.style.setProperty("--preview-rx", `${(0.5 - event.clientY / window.innerHeight) * 4}deg`);
-  };
+  const previewProject = hoveredProject ?? visibleProjects[0] ?? projects[0];
+  const projectTotal = String(projects.length).padStart(2, "0");
 
   const activate = (project: Project) => {
     setHoveredId(project.id);
@@ -475,12 +543,11 @@ function ProjectsSection({
       aria-labelledby="work-title"
       data-has-hover={Boolean(hoveredId)}
       style={{ "--section-accent": hoveredProject?.accent ?? "#44cfff", "--section-surface": hoveredProject?.surface ?? "#0d1013" } as CSSProperties}
-      onPointerMove={movePreview}
       onPointerLeave={deactivate}
     >
       <div className="projects-heading" data-reveal>
         <div>
-          <p className="eyebrow">Selected work / 01—06</p>
+          <p className="eyebrow">Selected work / 01—{projectTotal}</p>
           <h2 id="work-title">The product is only half the system.</h2>
         </div>
         <p>Large interfaces, careful APIs, and automation designed around real operational edges.</p>
@@ -503,66 +570,88 @@ function ProjectsSection({
       </div>
       <p className="sr-only" aria-live="polite">{visibleProjects.length} projects shown.</p>
 
-      <motion.ol className="project-list" layout>
-        <AnimatePresence mode="popLayout" initial={false}>
-          {visibleProjects.map((project) => (
-            <motion.li
-              layout
-              key={project.id}
-              className={`project-row ${hoveredId === project.id ? "is-active" : ""}`}
-              style={{ "--project-accent": project.accent, "--project-surface": project.surface } as CSSProperties}
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -18 }}
-              transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <button
-                type="button"
-                data-cursor="view"
-                aria-label={`Open case study for ${project.title}`}
-                onPointerEnter={() => activate(project)}
-                onPointerLeave={deactivate}
-                onPointerCancel={deactivate}
-                onFocus={() => activate(project)}
-                onBlur={deactivate}
-                onClick={(event) => onOpen(project, event.currentTarget)}
+      <div className="project-index-grid" onPointerLeave={deactivate}>
+        <motion.ol className="project-list" layout>
+          <AnimatePresence mode="popLayout" initial={false}>
+            {visibleProjects.map((project) => (
+              <motion.li
+                layout
+                key={project.id}
+                className={`project-row ${hoveredId === project.id ? "is-active" : ""}`}
+                style={{ "--project-accent": project.accent, "--project-surface": project.surface } as CSSProperties}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -18 }}
+                transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
               >
-                <span className="project-number">{project.number}</span>
-                <span className="project-main">
-                  <motion.span className="project-title" layoutId={`project-title-${project.id}`}>
-                    {project.title}
-                  </motion.span>
-                  <span className="project-category">{project.category}</span>
-                </span>
-                <span className="project-role"><small>Role</small>{project.role}</span>
-                <span className="project-stack"><small>Stack</small>{project.stack.slice(0, 4).join(" · ")}</span>
-                <span className="project-year"><small>Year</small>{project.year}</span>
-                <span className="project-arrow" aria-hidden="true">↗</span>
-                <span className="project-techs" aria-hidden="true">
-                  {project.technologyIds.slice(0, 5).map((technologyId) => (
-                    <span key={technologyId}><TechIcon id={technologyId} /></span>
-                  ))}
-                </span>
-                <span className="mobile-project-visual">
-                  <ProjectVisual kind={project.preview} />
-                </span>
-              </button>
-            </motion.li>
-          ))}
-        </AnimatePresence>
-      </motion.ol>
+                <button
+                  type="button"
+                  data-cursor="view"
+                  aria-label={`Open case study for ${project.title}`}
+                  onPointerEnter={() => activate(project)}
+                  onPointerCancel={deactivate}
+                  onFocus={() => activate(project)}
+                  onBlur={deactivate}
+                  onClick={(event) => onOpen(project, event.currentTarget)}
+                >
+                  <span className="project-number">{project.number}</span>
+                  <span className="project-main">
+                    <motion.span className="project-title" layoutId={`project-title-${project.id}`}>
+                      {project.title}
+                    </motion.span>
+                    <span className="project-category">{project.category}</span>
+                  </span>
+                  <span className="project-role"><small>Role</small>{project.role}</span>
+                  <span className="project-stack"><small>Stack</small>{project.stack.slice(0, 4).join(" · ")}</span>
+                  <span className="project-year"><small>Year</small>{project.year}</span>
+                  <span className="project-arrow" aria-hidden="true">↗</span>
+                  <span className="project-techs" aria-hidden="true">
+                    {project.technologyIds.slice(0, 5).map((technologyId) => (
+                      <span key={technologyId}><TechIcon id={technologyId} /></span>
+                    ))}
+                  </span>
+                  <span className="mobile-project-visual">
+                    <ProjectMedia project={project} />
+                  </span>
+                </button>
+              </motion.li>
+            ))}
+          </AnimatePresence>
+        </motion.ol>
 
-      <div
-        ref={previewRef}
-        className={`floating-preview ${hoveredProject ? "is-visible" : ""}`}
-        aria-hidden="true"
-      >
-        {hoveredProject ? (
-          <motion.div layoutId={`project-frame-${hoveredProject.id}`}>
-            <ProjectVisual kind={hoveredProject.preview} />
-            <div className="preview-caption"><span>{hoveredProject.number}</span>{hoveredProject.category}</div>
-          </motion.div>
-        ) : null}
+        <aside
+          className="project-preview-dock"
+          aria-hidden="true"
+          style={{ "--project-accent": previewProject.accent, "--project-surface": previewProject.surface } as CSSProperties}
+        >
+          <div className="preview-dock-toolbar">
+            <span>System preview / live</span>
+            <span>{previewProject.number} / {projectTotal}</span>
+          </div>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={previewProject.id}
+              className="preview-dock-stage"
+              layoutId={`project-frame-${previewProject.id}`}
+              initial={{ opacity: 0, clipPath: "inset(6% 0 12% 0)" }}
+              animate={{ opacity: 1, clipPath: "inset(0% 0 0% 0)" }}
+              exit={{ opacity: 0, clipPath: "inset(0 0 100% 0)" }}
+              transition={{ duration: 0.36, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <ProjectMedia project={previewProject} />
+            </motion.div>
+          </AnimatePresence>
+          <div className="preview-dock-caption">
+            <span>Current focus</span>
+            <strong>{previewProject.title}</strong>
+            <small>{previewProject.category}</small>
+            <div>
+              {previewProject.technologyIds.slice(0, 5).map((technologyId) => (
+                <span key={technologyId}><TechIcon id={technologyId} /></span>
+              ))}
+            </div>
+          </div>
+        </aside>
       </div>
     </section>
   );
@@ -660,7 +749,7 @@ function CaseStudyOverlay({
             <p>{project.role} / {project.periodLabel}</p>
           </div>
           <motion.div className="case-hero-visual" layoutId={`project-frame-${project.id}`}>
-            <ProjectVisual kind={project.preview} expanded />
+            <ProjectMedia project={project} expanded />
           </motion.div>
         </div>
 
@@ -701,11 +790,11 @@ function CaseStudyOverlay({
         </section>
 
         <section className="case-gallery case-section" aria-labelledby={`gallery-${project.id}`}>
-          <p className="case-label" id={`gallery-${project.id}`}>Visual gallery / conceptual system views</p>
+          <p className="case-label" id={`gallery-${project.id}`}>Visual gallery / product views</p>
           <div>
             {project.gallery.map((item, index) => (
               <figure key={item.label}>
-                <ProjectVisual kind={project.preview} expanded={index === 0} />
+                <ProjectMedia project={project} imageIndex={index} expanded={index === 0} />
                 <figcaption><span>{String(index + 1).padStart(2, "0")} / {item.label}</span>{item.note}</figcaption>
               </figure>
             ))}
@@ -728,60 +817,6 @@ function CaseStudyOverlay({
         </button>
       </motion.div>
     </motion.div>
-  );
-}
-
-function AutomationSection() {
-  const [activeId, setActiveId] = useState(capabilities[0].id);
-  const activeCapability = capabilities.find((capability) => capability.id === activeId) ?? capabilities[0];
-  const lanes = ["Intake", "Orchestration", "Intelligence & data", "Reliability & handoff"] as const;
-
-  return (
-    <section className="automation-section" id="automation" aria-labelledby="automation-title">
-      <div className="automation-heading" data-reveal>
-        <p className="eyebrow">n8n capability / beyond the UI</p>
-        <h2 id="automation-title">Automation that handles the work after the interface.</h2>
-        <p>I design n8n workflows that connect APIs, validate and transform data, orchestrate AI models, handle failures, maintain workflow state, and route edge cases to humans.</p>
-      </div>
-
-      <div className="capability-system" data-reveal>
-        <div className="capability-toolbar">
-          <span><TechIcon id="n8n" /> Workflow map / 12 capabilities</span>
-          <span className="system-live"><i /> System live</span>
-        </div>
-        <div className="capability-map">
-          {lanes.map((lane, laneIndex) => (
-            <div className="capability-lane" key={lane}>
-              <header><span>{String(laneIndex + 1).padStart(2, "0")}</span>{lane}</header>
-              <div>
-                {capabilities.filter((capability) => capability.lane === lane).map((capability) => (
-                  <button
-                    type="button"
-                    key={capability.id}
-                    className={activeId === capability.id ? "is-active" : undefined}
-                    aria-pressed={activeId === capability.id}
-                    onPointerEnter={() => setActiveId(capability.id)}
-                    onFocus={() => setActiveId(capability.id)}
-                    onClick={() => setActiveId(capability.id)}
-                  >
-                    <span>{capability.number}</span>
-                    <b>{capability.label}</b>
-                    <i aria-hidden="true" />
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
-          <div className="map-signal" aria-hidden="true" />
-        </div>
-        <div className="capability-detail" aria-live="polite">
-          <span>{activeCapability.number} / {activeCapability.lane}</span>
-          <h3>{activeCapability.label}</h3>
-          <p>{activeCapability.description}</p>
-        </div>
-      </div>
-      <p className="trademark-note">Independent n8n specialist. n8n is a trademark of its owner; no employment, partnership, or endorsement is implied.</p>
-    </section>
   );
 }
 
@@ -1100,7 +1135,7 @@ function ContactSection() {
         <a href={siteConfig.links.resume} download>Résumé <span>Download ↓</span></a>
       </div>
       <footer>
-        <span>© 2026 Raheeb-ur Rehman</span>
+        <span>© 2026 Raheeb ur Rehman</span>
         <span>Lahore, Pakistan / Remote worldwide</span>
         <a href="#top">Back to top ↑</a>
       </footer>

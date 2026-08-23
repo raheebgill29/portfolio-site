@@ -22,7 +22,7 @@ export type Project = {
   architecture: string[];
   functionality: string[];
   decisions: string[];
-  gallery: { label: string; note: string }[];
+  gallery: { label: string; note: string; image?: string; alt?: string }[];
 };
 
 export const projectFilters: { id: ProjectFilter; label: string }[] = [
@@ -61,8 +61,13 @@ export const projects: Project[] = [
     functionality: ["Interested / Not Interested / Opt-Out / Unclear states", "Permanent opt-out suppression", "Duplicate-event protection", "Local-time contact windows", "Delayed follow-ups", "Data Tables state and audit records", "Human review for ambiguous replies"],
     decisions: ["Separate inbound and outbound workflows so responsibilities and failure paths remain clear.", "Re-check suppression immediately before each contact attempt.", "Persist workflow state instead of relying on execution memory.", "Route unclear replies to people rather than forcing an unreliable classification."],
     gallery: [
-      { label: "Outbound control flow", note: "Consent, idempotency, suppression, and local-hour gates before contact." },
-      { label: "Reply intelligence", note: "Matched inbound responses route to the correct operational state." },
+      { label: "Outbound control flow", note: "Consent, idempotency, suppression, and local-hour gates before contact.", image: "/dealership-lead-system.jpg", alt: "AI lead follow-up automation routing leads through messaging, AI classification, opt-out protection, and human review" },
+      {
+        label: "Production workflow",
+        note: "The complete n8n system connects intake, validation, suppression, reply routing, and follow-up branches.",
+        image: "/dealership-lead-system-2.jpg",
+        alt: "n8n dealership lead follow-up workflow with intake, validation, suppression, reply routing, and follow-up branches",
+      },
       { label: "Human handoff", note: "Unclear replies arrive with context instead of disappearing into a dead end." },
     ],
   },
@@ -90,8 +95,13 @@ export const projects: Project[] = [
     functionality: ["Multi-competitor batch processing", "Separate image, video, and carousel paths", "Asynchronous job polling", "OpenAI agent analysis", "Schema-enforced structured outputs", "Live Sheets reporting"],
     decisions: ["Deduplicate before beginning expensive API and AI work.", "Give each media type its own processing path.", "Poll slower jobs instead of blocking the main workflow.", "Require schema-valid AI output before merging records.", "Converge every branch into one reporting shape."],
     gallery: [
-      { label: "Media routing", note: "Every asset type enters the analysis system through its own controlled path." },
-      { label: "AI transformation", note: "Unstructured content becomes schema-valid, comparable data." },
+      { label: "Media routing", note: "Every asset type enters the analysis system through its own controlled path.", image: "/competitor-content-analysis.jpg", alt: "Competitor content intelligence workflow showing content routing, AI insights, structured output, and live reporting" },
+      {
+        label: "Production workflow",
+        note: "The full n8n canvas shows media routing, asynchronous processing, AI analysis, merging, and reporting.",
+        image: "/competitor-content-analysis-2.png",
+        alt: "n8n competitor content intelligence workflow with media routing, AI analysis, polling, merging, and reporting nodes",
+      },
       { label: "Live report", note: "Merged results populate an operations-ready sheet without cleanup." },
     ],
   },
@@ -119,7 +129,7 @@ export const projects: Project[] = [
     functionality: ["Conversational AI interfaces", "Blog, code-writing, and FAQ agents", "Evaluation dashboards", "Request and safety monitoring", "Guest / User / Admin access", "Persistent conversations", "Microsoft service integrations"],
     decisions: ["Keep the frontend and AI orchestration separated by a FastAPI boundary.", "Use shared application layouts across chat, evaluation, and administration modules.", "Persist conversation state in Cosmos DB.", "Make evaluations, safety information, and request monitoring visible product features.", "Apply explicit role-based access instead of UI-only permissions."],
     gallery: [
-      { label: "Conversational workspace", note: "A reusable chat surface connected to production AI services." },
+      { label: "Conversational workspace", note: "A reusable chat surface connected to production AI services.", image: "/synoptix-image.png", alt: "Synoptix AI platform showing its enterprise website, conversational workspace, and observability dashboard" },
       { label: "Evaluation command centre", note: "Monitoring, charts, safety categories, and request-level detail." },
       { label: "Microsoft connections", note: "Identity and service integrations cross the frontend/service boundary." },
     ],
@@ -127,7 +137,7 @@ export const projects: Project[] = [
   {
     id: "automotive-inventory-platform",
     number: "04",
-    title: "Automotive Inventory Platform",
+    title: "RBCAR Company",
     category: "Frontend Product Development",
     filterTags: ["frontend"],
     role: "Frontend Developer",
@@ -138,16 +148,31 @@ export const projects: Project[] = [
     accent: "#579dff",
     surface: "#0a111a",
     preview: "automotive",
-    description: ["An API-driven dealership platform containing vehicle inventory, advanced filters, vehicle detail pages, saved vehicles, comparison functionality, dealership maps, location cards, and inventory reporting."],
+    description: ["RBCAR Company is an API-driven dealership platform containing vehicle inventory, advanced filters, vehicle detail pages, saved vehicles, comparison functionality, dealership maps, location cards, and inventory reporting."],
     problem: "Dealership inventory must remain understandable across a large, changing vehicle catalogue while supporting detailed filtering, comparison, saving, location discovery, and reporting.",
     responsibilities: ["Built responsive, API-integrated Next.js interfaces from design specifications.", "Developed reusable inventory, vehicle-detail, filter, saved-vehicle, comparison, location, map, and reporting views.", "Collaborated with design and backend teams while maintaining reusable frontend architecture."],
     architecture: ["REST inventory source", "Typed frontend data layer", "Filters & result state", "Inventory cards", "Vehicle details", "Saved & comparison views", "Dealership maps", "Reporting visualizations"],
     functionality: ["Advanced vehicle filters", "Inventory and detail pages", "Saved vehicles", "Side-by-side comparison", "Maps and location cards", "Inventory reporting", "Responsive layouts"],
     decisions: ["Reuse one vehicle model across browsing, details, comparisons, maps, and reports.", "Centralize filtering behavior across every inventory surface.", "Isolate map and reporting integrations from core browsing UI.", "Build components suitable for multiple dealership implementations."],
     gallery: [
-      { label: "Inventory discovery", note: "Filters and card systems make a changing catalogue easy to scan." },
-      { label: "Compare & save", note: "Customer decision tools share one consistent vehicle data model." },
-      { label: "Dealer geography", note: "Locations and reporting extend the browsing experience into operations." },
+      {
+        label: "Dealership landing page",
+        note: "A search-led homepage introduces the dealership and moves customers directly into the available inventory.",
+        image: "/rbcar.png",
+        alt: "RBCAR Company dealership homepage with vehicle search and used inventory introduction",
+      },
+      {
+        label: "Inventory discovery",
+        note: "Advanced filters, vehicle cards, pricing information, and saved-item controls make a large catalogue easier to explore.",
+        image: "/rbcar-1.png",
+        alt: "RBCAR Company used vehicle inventory page with filters, vehicle cards, pricing, and saved-item controls",
+      },
+      {
+        label: "Dealer locations",
+        note: "An interactive map connects customers with dealership locations across South Bend, Warsaw, and Fort Wayne.",
+        image: "/rbcar-2.png",
+        alt: "RBCAR Company dealership locations page with an interactive regional map and three dealership addresses",
+      },
     ],
   },
   {
@@ -171,9 +196,24 @@ export const projects: Project[] = [
     functionality: ["Multi-tenant property management", "AI-assisted maintenance coordination", "Tenant communication automation", "Lease tracking", "Owner reporting", "Responsive API-integrated journeys"],
     decisions: ["Treat tenant context as a core product boundary.", "Use a shared component foundation across operational workflows.", "Keep external services behind application APIs.", "Maintain consistent behavior across tenant, property, and reporting views."],
     gallery: [
-      { label: "Responsive shell", note: "Reusable navigation and layout regions assemble around each workflow." },
-      { label: "Property operations", note: "Maintenance, communication, and leases share one clear product language." },
-      { label: "Owner reporting", note: "Operational data resolves into readable management views." },
+      {
+        label: "Product landing experience",
+        note: "A clear, responsive introduction to the operating system for self-managing landlords.",
+        image: "/homedash.png",
+        alt: "HomeDash homepage for self-managing UK landlords",
+      },
+      {
+        label: "Landlord briefing",
+        note: "Property-market and regulatory insight presented as a focused editorial report.",
+        image: "/homedash-2.png",
+        alt: "HomeDash Landlord Briefing page with property market analysis",
+      },
+      {
+        label: "Connected dashboard",
+        note: "Compliance, properties, finances, due dates, and AI assistance brought into one operational view.",
+        image: "/homedash-3.png",
+        alt: "HomeDash dashboard showing compliance, properties, finances, due dates, and an AI assistant",
+      },
     ],
   },
   {
@@ -190,16 +230,48 @@ export const projects: Project[] = [
     accent: "#eab36f",
     surface: "#17130d",
     preview: "commerce",
-    description: ["A customized e-commerce storefront featuring improved collections, responsive product presentation, checkout configuration, delivery settings, and store-specific UI improvements."],
-    problem: "The storefront needed store-specific merchandising, responsive product presentation, and correctly configured purchasing and delivery experiences.",
-    responsibilities: ["Customized the storefront theme and collection presentation.", "Built responsive commerce UI improvements.", "Configured checkout and delivery settings.", "Delivered store-specific collection and product experiences."],
-    architecture: ["Shopify catalogue", "Collections", "Theme sections", "Responsive product presentation", "Cart", "Shopify checkout", "Delivery configuration"],
-    functionality: ["Customized collections", "Responsive product tiles", "Store-specific UI improvements", "Checkout configuration", "Delivery settings"],
-    decisions: ["Extend Shopify’s theme system rather than replacing the commerce platform.", "Use modular theme sections for maintainable merchandising.", "Retain Shopify-native checkout and delivery configuration.", "Prioritize responsive catalogue browsing."],
+    description: [
+      "Darwaza is a modern fashion e-commerce website designed for clothing, accessories, jewellery, and lifestyle products. Its clean responsive interface supports product categories, new-arrival showcases, top-rated products, and detailed product discovery.",
+      "The shopping experience includes wishlist functionality, a persistent cart, customer sign-in, checkout and delivery configuration, and mobile-friendly journeys designed to keep browsing and purchasing clear across devices.",
+    ],
+    problem: "A varied fashion and lifestyle catalogue needed a cohesive storefront that could support editorial merchandising, product discovery, customer accounts, and the full purchasing journey without becoming difficult to navigate on mobile.",
+    responsibilities: ["Customized the storefront theme and collection presentation.", "Built responsive category, new-arrival, top-rated, and product-detail experiences.", "Implemented wishlist, cart, customer sign-in, checkout, and delivery flows.", "Delivered store-specific interface improvements across desktop and mobile."],
+    architecture: ["Shopify catalogue", "Categories & collections", "Theme sections", "Product details", "Wishlist", "Shopping cart", "Customer account", "Shopify checkout", "Delivery configuration"],
+    functionality: ["Fashion and lifestyle categories", "New-arrival and top-rated showcases", "Responsive product details", "Wishlist", "Shopping cart", "Customer sign-in", "Checkout and delivery settings"],
+    decisions: ["Extend Shopify’s theme system rather than replacing the commerce platform.", "Use modular merchandising sections across categories and product collections.", "Keep wishlist, cart, and account actions consistently available.", "Retain Shopify-native checkout and delivery configuration.", "Prioritize touch-friendly catalogue browsing on smaller screens."],
     gallery: [
-      { label: "Collection system", note: "Merchandising modules assemble into an intentional storefront rhythm." },
-      { label: "Product presentation", note: "Responsive product tiles keep browsing clear across devices." },
-      { label: "Checkout handoff", note: "Store-specific UI leads into the platform’s native purchase flow." },
+      { label: "New arrivals", note: "An editorial landing experience introduces the latest fashion collection.", image: "/darwaza.jpg", alt: "Darwaza fashion storefront new arrivals hero section" },
+      { label: "Category discovery", note: "Clothing, accessories, jewellery, and new products are organized into clear visual entry points.", image: "/darwaza-1.png", alt: "Darwaza shop-by-category page with clothing, accessories, jewellery, and new-in categories" },
+      { label: "Fashion story", note: "Large-format editorial content gives the storefront a distinctive visual identity.", image: "/darwaza-2.png", alt: "Darwaza editorial fashion section displayed beneath the product categories" },
+    ],
+  },
+  {
+    id: "sudeshi-ecommerce",
+    number: "07",
+    title: "Sudeshi E-commerce",
+    category: "E-commerce Web Application",
+    filterTags: ["frontend"],
+    role: "Frontend Developer",
+    stack: ["React", "JavaScript", "Responsive UI", "E-commerce UX"],
+    technologyIds: ["react", "javascript"],
+    year: "Selected",
+    periodLabel: "Selected e-commerce project",
+    accent: "#b78372",
+    surface: "#17110f",
+    preview: "commerce",
+    description: [
+      "Sudeshi is a responsive fashion e-commerce application that combines culturally rooted presentation with a contemporary shopping experience. The storefront uses editorial imagery, clear collection navigation, and focused product discovery to establish a distinct identity.",
+      "Reusable catalogue and merchandising patterns keep featured products, categories, sizing, and shopping journeys consistent across desktop and mobile views.",
+    ],
+    problem: "The fashion catalogue needed to communicate a strong brand identity while keeping product discovery, sizing, and responsive shopping interactions straightforward for customers.",
+    responsibilities: ["Built the responsive storefront and reusable merchandising sections.", "Developed featured-product and catalogue presentation patterns.", "Translated the visual identity into consistent navigation, product cards, sizing controls, and responsive layouts.", "Refined the experience for desktop and mobile shopping journeys."],
+    architecture: ["Storefront shell", "Collection navigation", "Editorial hero", "Featured products", "Reusable product cards", "Size selection", "Responsive catalogue", "Shopping journey"],
+    functionality: ["Editorial fashion landing page", "New-arrival and category navigation", "Featured product catalogue", "Product sizing options", "Responsive product presentation", "Mobile-friendly shopping experience"],
+    decisions: ["Let the brand imagery lead without reducing navigation clarity.", "Use reusable catalogue patterns for consistent product presentation.", "Keep sizing and product information close to each purchasing decision.", "Preserve comfortable image proportions across responsive breakpoints."],
+    gallery: [
+      { label: "Editorial storefront", note: "A heritage-led hero introduces the brand and directs customers into the catalogue.", image: "/sudeshi.jpg", alt: "Sudeshi fashion e-commerce homepage with Wear Your Roots campaign hero" },
+      { label: "Featured products", note: "A structured product catalogue presents pricing and sizing without competing with the imagery.", image: "/sudeshi-1.png", alt: "Sudeshi featured products catalogue with clothing, prices, and size options" },
+      { label: "Catalogue continuation", note: "Responsive merchandising patterns carry the visual identity deeper into the shopping experience.", image: "/sudeshi-2.png", alt: "Sudeshi responsive fashion product catalogue section" },
     ],
   },
 ];
