@@ -240,7 +240,7 @@ export const projects: Project[] = [
     functionality: ["Fashion and lifestyle categories", "New-arrival and top-rated showcases", "Responsive product details", "Wishlist", "Shopping cart", "Customer sign-in", "Checkout and delivery settings"],
     decisions: ["Extend Shopify’s theme system rather than replacing the commerce platform.", "Use modular merchandising sections across categories and product collections.", "Keep wishlist, cart, and account actions consistently available.", "Retain Shopify-native checkout and delivery configuration.", "Prioritize touch-friendly catalogue browsing on smaller screens."],
     gallery: [
-      { label: "New arrivals", note: "An editorial landing experience introduces the latest fashion collection.", image: "/darwaza.jpg", alt: "Darwaza fashion storefront new arrivals hero section" },
+      { label: "New arrivals", note: "An editorial landing experience introduces the latest fashion collection.", image: "/darwaza.png", alt: "Darwaza fashion storefront new arrivals hero section" },
       { label: "Category discovery", note: "Clothing, accessories, jewellery, and new products are organized into clear visual entry points.", image: "/darwaza-1.png", alt: "Darwaza shop-by-category page with clothing, accessories, jewellery, and new-in categories" },
       { label: "Fashion story", note: "Large-format editorial content gives the storefront a distinctive visual identity.", image: "/darwaza-2.png", alt: "Darwaza editorial fashion section displayed beneath the product categories" },
     ],
@@ -269,7 +269,7 @@ export const projects: Project[] = [
     functionality: ["Editorial fashion landing page", "New-arrival and category navigation", "Featured product catalogue", "Product sizing options", "Responsive product presentation", "Mobile-friendly shopping experience"],
     decisions: ["Let the brand imagery lead without reducing navigation clarity.", "Use reusable catalogue patterns for consistent product presentation.", "Keep sizing and product information close to each purchasing decision.", "Preserve comfortable image proportions across responsive breakpoints."],
     gallery: [
-      { label: "Editorial storefront", note: "A heritage-led hero introduces the brand and directs customers into the catalogue.", image: "/sudeshi.jpg", alt: "Sudeshi fashion e-commerce homepage with Wear Your Roots campaign hero" },
+      { label: "Editorial storefront", note: "A heritage-led hero introduces the brand and directs customers into the catalogue.", image: "/sudeshi.png", alt: "Sudeshi fashion e-commerce homepage with Wear Your Roots campaign hero" },
       { label: "Featured products", note: "A structured product catalogue presents pricing and sizing without competing with the imagery.", image: "/sudeshi-1.png", alt: "Sudeshi featured products catalogue with clothing, prices, and size options" },
       { label: "Catalogue continuation", note: "Responsive merchandising patterns carry the visual identity deeper into the shopping experience.", image: "/sudeshi-2.png", alt: "Sudeshi responsive fashion product catalogue section" },
     ],
