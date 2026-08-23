@@ -276,7 +276,7 @@ export function AutomationEngine() {
             </motion.span>
           </span>
         </h2>
-        <p className="automation-engine-intro-copy">I design production-ready n8n and AI workflows that connect APIs, validate data, make decisions, recover from failures and route edge cases to humans.</p>
+        <p className={`automation-engine-intro-copy ${introInView ? "is-visible" : ""}`}>I design production-ready n8n and AI workflows that connect APIs, validate data, make decisions, recover from failures and route edge cases to humans.</p>
       </div>
 
       <div ref={scrollRef} className="automation-engine-scroll">

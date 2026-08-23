@@ -410,15 +410,21 @@ function HeroSystem({ introReady }: { introReady: boolean }) {
       <div className="hero-system-map">
         <motion.span
           className="hero-system-path path-a"
-          variants={{ hidden: { clipPath: "inset(0 100% 0 0)", opacity: 0 }, visible: { clipPath: "inset(0 0% 0 0)", opacity: 1, transition: { delay: 0.52, duration: 0.9, ease: technicalEase } } }}
+          initial={reduceMotion ? false : { clipPath: "inset(0 100% 0 0)", opacity: 0 }}
+          animate={motionState === "visible" ? { clipPath: "inset(0 0% 0 0)", opacity: 1 } : { clipPath: "inset(0 100% 0 0)", opacity: 0 }}
+          transition={{ delay: 0.78, duration: 1.15, ease: technicalEase }}
         />
         <motion.span
           className="hero-system-path path-b"
-          variants={{ hidden: { clipPath: "inset(0 100% 0 0)", opacity: 0 }, visible: { clipPath: "inset(0 0% 0 0)", opacity: 1, transition: { delay: 0.78, duration: 0.9, ease: technicalEase } } }}
+          initial={reduceMotion ? false : { clipPath: "inset(0 100% 0 0)", opacity: 0 }}
+          animate={motionState === "visible" ? { clipPath: "inset(0 0% 0 0)", opacity: 1 } : { clipPath: "inset(0 100% 0 0)", opacity: 0 }}
+          transition={{ delay: 1.02, duration: 1.15, ease: technicalEase }}
         />
         <motion.i
           className="hero-system-packet"
-          variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { delay: 1.02, duration: 0.35 } } }}
+          initial={reduceMotion ? false : { opacity: 0 }}
+          animate={motionState === "visible" ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ delay: 1.65, duration: 0.35 }}
         />
         <motion.div className="hero-system-node node-ui" custom={0} variants={heroSystemNodeVariants}>
           <small>01 / Interface</small><b>Product UI</b><em>Next.js · React</em>
