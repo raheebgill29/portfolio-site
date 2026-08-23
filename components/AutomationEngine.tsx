@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import {
   useEffect,
   useRef,
@@ -120,6 +120,7 @@ function AutomationStageGroup({
 export function AutomationEngine() {
   const reduceMotion = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
+  const introRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const workspaceRef = useRef<HTMLDivElement>(null);
   const connectorRefs = useRef<Array<SVGPathElement | null>>([]);
@@ -129,6 +130,7 @@ export function AutomationEngine() {
   const [activeStage, setActiveStage] = useState(0);
   const [finalRunning, setFinalRunning] = useState(false);
   const [expandedNode, setExpandedNode] = useState<string | null>(null);
+  const introInView = useInView(introRef, { once: true, amount: 0.3 });
   const displayedStage = reduceMotion || !isDesktop
     ? automationStages.length - 1
     : activeStage;
@@ -252,14 +254,13 @@ export function AutomationEngine() {
       id="automation"
       aria-labelledby="automation-title"
     >
-      <div className="automation-engine-intro">
+      <div ref={introRef} className="automation-engine-intro">
         <p className="eyebrow">02 / Automation systems</p>
         <h2 id="automation-title">
           <span className="automation-mask-line">
             <motion.span
               initial={reduceMotion ? false : { y: "110%", x: "-2%" }}
-              whileInView={{ y: 0, x: 0 }}
-              viewport={{ once: true, amount: 0.55 }}
+              animate={reduceMotion || introInView ? { y: 0, x: 0 } : undefined}
               transition={{ duration: 0.85, ease: revealEase }}
             >
               The interface is only the beginning.
@@ -268,8 +269,7 @@ export function AutomationEngine() {
           <span className="automation-mask-line automation-secondary-line">
             <motion.span
               initial={reduceMotion ? false : { y: "110%", x: "2%" }}
-              whileInView={{ y: 0, x: 0 }}
-              viewport={{ once: true, amount: 0.55 }}
+              animate={reduceMotion || introInView ? { y: 0, x: 0 } : undefined}
               transition={{ duration: 0.85, delay: 0.1, ease: revealEase }}
             >
               I build what happens next.
