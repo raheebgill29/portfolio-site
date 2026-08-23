@@ -881,12 +881,33 @@ function ContactSection() {
   const [formOpen, setFormOpen] = useState(false);
   const [formStatus, setFormStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = useState("");
+  const prefersReducedMotion = useReducedMotion();
+  const formPanelRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const emailJsReady = Boolean(
     siteConfig.emailjs.serviceId &&
     siteConfig.emailjs.templateId &&
     siteConfig.emailjs.publicKey,
   );
+
+  useEffect(() => {
+    if (!formOpen) return;
+
+    let secondFrame = 0;
+    const firstFrame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(() => {
+        formPanelRef.current?.scrollIntoView({
+          behavior: prefersReducedMotion ? "auto" : "smooth",
+          block: "start",
+        });
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+      window.cancelAnimationFrame(secondFrame);
+    };
+  }, [formOpen, prefersReducedMotion]);
 
   const magneticMove = (event: ReactPointerEvent<HTMLButtonElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -982,7 +1003,14 @@ function ContactSection() {
           aria-expanded={formOpen}
           aria-controls="contact-form-panel"
           onClick={() => {
-            setFormOpen((open) => !open);
+            if (formOpen) {
+              formPanelRef.current?.scrollIntoView({
+                behavior: prefersReducedMotion ? "auto" : "smooth",
+                block: "start",
+              });
+              return;
+            }
+            setFormOpen(true);
             setFormStatus("idle");
             setStatusMessage("");
           }}
@@ -996,7 +1024,7 @@ function ContactSection() {
             <small>Project enquiry / contact form</small>
             <b>Start a conversation</b>
           </span>
-          <span className="contact-primary-arrow" aria-hidden="true">{formOpen ? "×" : "↗"}</span>
+          <span className="contact-primary-arrow" aria-hidden="true">{formOpen ? "↓" : "↗"}</span>
         </button>
         <div className="contact-availability">
           <span><i aria-hidden="true" /> Open to remote work</span>
@@ -1005,6 +1033,7 @@ function ContactSection() {
         <AnimatePresence initial={false}>
           {formOpen ? (
             <motion.div
+              ref={formPanelRef}
               className="contact-form-panel"
               id="contact-form-panel"
               initial={{ opacity: 0, height: 0, y: 18 }}
